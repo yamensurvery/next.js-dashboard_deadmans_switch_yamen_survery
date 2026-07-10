@@ -14,7 +14,7 @@ export async function encrypt(
   const encoded = new TextEncoder().encode(plaintext);
 
   const ciphertext = await crypto.subtle.encrypt(
-    { name: "AES-GCM", iv },
+    { name: "AES-GCM", iv: iv as BufferSource },
     key,
     encoded
   );
@@ -28,7 +28,7 @@ export async function decrypt(
   ciphertext: ArrayBuffer
 ): Promise<string> {
   const decrypted = await crypto.subtle.decrypt(
-    { name: "AES-GCM", iv },
+    { name: "AES-GCM", iv: iv as BufferSource },
     key,
     ciphertext
   );
@@ -53,7 +53,7 @@ export async function deriveKey(
   return crypto.subtle.deriveKey(
     {
       name: "PBKDF2",
-      salt,
+      salt: salt as BufferSource,
       iterations: 100000,
       hash: "SHA-256",
     },
@@ -63,6 +63,7 @@ export async function deriveKey(
     ["encrypt", "decrypt"]
   );
 }
+
 export function pack(iv: Uint8Array, ciphertext: ArrayBuffer): string {
   const ivBytes = Array.from(iv);
   const cipherBytes = Array.from(new Uint8Array(ciphertext));
@@ -89,7 +90,7 @@ export async function encryptBuffer(
   const iv = crypto.getRandomValues(new Uint8Array(12));
 
   const ciphertext = await crypto.subtle.encrypt(
-    { name: "AES-GCM", iv },
+    { name: "AES-GCM", iv: iv as BufferSource },
     key,
     data
   );
@@ -103,7 +104,7 @@ export async function decryptBuffer(
   ciphertext: ArrayBuffer
 ): Promise<ArrayBuffer> {
   return crypto.subtle.decrypt(
-    { name: "AES-GCM", iv },
+    { name: "AES-GCM", iv: iv as BufferSource },
     key,
     ciphertext
   );
